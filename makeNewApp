@@ -1,0 +1,50 @@
+#!/bin/sh
+#
+# Script
+#   makeNewApp
+#
+# Description
+#   Makes directory structure for a new OpenFOAM application
+#
+#   Usage: makeNewApp <newApplication>
+
+if [ -z "$1" ]; then
+    echo "Error: no argument supplied - exiting"
+    exit 1
+fi
+
+if [ -d "$1" ]; then
+    echo "Error: directory "$1" already exist - exiting"
+    exit 1
+fi
+
+mkdir "$1"
+cd "$1"
+mkdir Make
+
+
+# file "<newApplication>.C"
+printf "#include \"fvCFD.H\"
+
+using namespace Foam;
+
+int main(int argc, char *argv[])
+{
+    Info<< \"Text\\\n\" << endl;
+    return 0;
+}
+" > $1.C
+
+
+# file "files"
+printf "$1.C
+
+EXE = \$(FOAM_USER_APPBIN)/$1" > Make/files
+
+
+# file "options"
+printf "EXE_INC = \\
+    -I\$(LIB_SRC)/finiteVolume/lnInclude
+
+EXE_LIBS = \\
+    -lfiniteVolume" > Make/options
